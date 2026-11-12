@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>اطلس اسکیل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: graphite workbench — matte surfaces, glossy navy only on key panels, colour lives in small line icons */
+:root{
+  color-scheme:dark;
+  --ink:#06080d;            /* page */
+  --graphite:#0d1016;       /* matte surface */
+  --graphite-2:#121620;     /* raised matte */
+  --navy:#0f1d38;           /* glossy navy */
+  --hair:rgba(160,178,205,.11);
+  --hair-2:rgba(160,178,205,.22);
+  --fg:#e6ebf2; --muted:#8994a6; --dim:#5d6778;
+  --silver:#c9d1dc;
+  --cyan:#2fe0ff; --lime:#b9ff4a; --orange:#ff9a2e; --pink:#ff4fae; --violet:#9b7bff; --yellow:#ffd54a;
+  --f-body:Vazirmatn,"Segoe UI",Tahoma,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:16px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--f-body);color:var(--fg);background:var(--ink);min-height:100vh;overflow-x:hidden;
+  background-image:radial-gradient(900px 520px at 88% -8%,rgba(47,224,255,.07),transparent 60%),radial-gradient(800px 500px at -5% 30%,rgba(155,123,255,.06),transparent 60%)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.05;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{position:relative;z-index:1;max-width:1220px;margin:0 auto;padding-block:0 80px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+code{font-family:var(--f-mono);font-size:.9em;direction:ltr;unicode-bidi:isolate;color:var(--silver)}
+.ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* surfaces */
+.matte{background:var(--graphite);border:1px solid var(--hair);border-radius:var(--r)}
+.gloss{position:relative;border-radius:var(--r);border:1px solid var(--hair-2);
+  background:linear-gradient(170deg,#152645 0%,var(--navy) 40%,#0a1428 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 50px -24px rgba(0,0,0,.9)}
+.gloss::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),transparent 38%)}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:flex;align-items:center;gap:10px;padding:12px 0;
+  background:linear-gradient(180deg,rgba(6,8,13,.97),rgba(6,8,13,.86));backdrop-filter:blur(12px);border-bottom:1px solid var(--hair)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;white-space:nowrap}
+.brand .mark{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:var(--ink);
+  background:linear-gradient(140deg,var(--cyan),var(--violet))}
+.search{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:0 12px;height:44px;border-radius:12px;background:var(--graphite);border:1px solid var(--hair)}
+.search input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--fg);font:500 15px var(--f-body)}
+.search:focus-within{border-color:rgba(47,224,255,.45)}
+.iconbtn{width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:12px;cursor:pointer;color:var(--fg);
+  background:var(--graphite-2);border:1px solid var(--hair)}
+.iconbtn:hover{border-color:var(--hair-2)}
+.cur{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.cur b{color:var(--fg);font-weight:700}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(2,4,8,.6);backdrop-filter:blur(3px);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
+.drawer{position:fixed;top:0;bottom:0;right:0;z-index:41;width:min(340px,88vw);transform:translateX(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);
+  padding:calc(18px + env(safe-area-inset-top,0px)) calc(16px + env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) 16px;
+  background:linear-gradient(180deg,#0e1524,#080b12);border-left:1px solid var(--hair-2);overflow-y:auto}
+.open .scrim{opacity:1;pointer-events:auto}.open .drawer{transform:none}
+.drawer h3{margin:4px 0 14px;font-size:13px;letter-spacing:.12em;color:var(--muted);font-weight:700}
+.nav{display:grid;gap:6px}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;color:var(--fg);font:500 14.5px var(--f-body);border:1px solid transparent}
+.nav button:hover{background:var(--graphite-2)}
+.nav button.on{background:var(--graphite-2);border-color:var(--hair-2)}
+.nav .n{margin-inline-start:auto;font:600 12px var(--f-mono);color:var(--dim)}
+.tile{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--c);flex:none;
+  background:color-mix(in srgb,var(--c) 13%,var(--graphite));border:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
+.drawer .sep{height:1px;background:var(--hair);margin:14px 0}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:center;padding:44px 0 18px}
+.eyebrow{font:700 11.5px var(--f-mono);letter-spacing:.22em;color:var(--cyan);direction:ltr;text-align:right}
+h1{margin:12px 0 12px;font-weight:900;font-size:clamp(36px,6vw,62px);line-height:1.08;text-wrap:balance;
+  background:linear-gradient(180deg,#ffffff 0%,#dfe5ee 55%,#9ba6b6 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--muted);font-size:16.5px;line-height:1.95;max-width:58ch;margin:0}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.stat{display:flex;align-items:baseline;gap:8px;padding:10px 14px}
+.stat b{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}
+.stat span{font-size:12.5px;color:var(--muted)}
+
+.scene{height:330px;perspective:1100px;display:grid;place-items:center}
+.stack{position:relative;width:250px;height:300px;transform-style:preserve-3d;transform:rotateX(18deg) rotateY(-32deg);animation:float 7s ease-in-out infinite}
+.pane{position:absolute;inset:0;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;
+  background:linear-gradient(165deg,rgba(28,44,78,.78),rgba(9,16,32,.86));border:1px solid rgba(170,190,220,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 30px 50px -20px rgba(0,0,0,.8);backdrop-filter:blur(2px)}
+.pane:nth-child(1){transform:translateZ(-90px) translate(-34px,34px)}
+.pane:nth-child(2){transform:translateZ(-20px) translate(-12px,12px)}
+.pane:nth-child(3){transform:translateZ(50px) translate(12px,-12px)}
+.pane .lbl{display:flex;align-items:center;gap:8px;font:700 11px var(--f-mono);letter-spacing:.14em;color:var(--c);direction:ltr}
+.pane .lbl i{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c)}
+.track{height:12px;border-radius:6px;background:rgba(255,255,255,.05);position:relative;overflow:hidden}
+.track span{position:absolute;top:2px;bottom:2px;border-radius:4px;background:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 40%,transparent))}
+.wave{display:flex;align-items:center;gap:4px;height:120px}
+.wave span{flex:1;border-radius:3px;background:linear-gradient(180deg,var(--lime),rgba(185,255,74,.25));animation:eq 1.6s ease-in-out infinite}
+.cap{margin-top:auto;align-self:center;padding:8px 14px;border-radius:10px;background:rgba(2,6,14,.7);font-weight:700;font-size:15px}
+.cap em{font-style:normal;color:var(--cyan)}
+.kf{display:flex;gap:6px;margin-top:4px}
+.kf i{width:9px;height:9px;transform:rotate(45deg);background:var(--orange);border-radius:2px}
+@keyframes float{50%{transform:rotateX(14deg) rotateY(-24deg) translateY(-8px)}}
+@keyframes eq{50%{transform:scaleY(.45)}}
+
+/* how */
+.how{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 8px}
+.how article{padding:18px}
+.how .tile{margin-bottom:12px}
+.how h3{margin:0 0 6px;font-size:16px}
+.how p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.85}
+
+/* categories & cards */
+.cat{margin:40px 0 0;scroll-margin-top:90px}
+.cat-head{display:flex;align-items:center;gap:12px}
+.cat-head h2{margin:0;font-size:21px;font-weight:800;text-wrap:balance}
+.cat-head small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:12px;margin-top:16px;perspective:1300px}
+.card{position:relative;display:flex;flex-direction:column;padding:16px;border-radius:14px;transform-style:preserve-3d;transition:transform .25s ease,border-color .2s;
+  background:linear-gradient(180deg,var(--graphite-2),var(--graphite));border:1px solid var(--hair);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 16px 34px -22px rgba(0,0,0,.9)}
+.card:hover{border-color:color-mix(in srgb,var(--c) 45%,transparent)}
+.card .top{display:flex;align-items:center;gap:10px}
+.card .dotc{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c);flex:none}
+.name{font:700 14.5px var(--f-mono);direction:ltr;color:#fff;min-width:0;overflow-wrap:anywhere}
+.badge{margin-inline-start:auto;font:700 10.5px var(--f-body);padding:3px 8px;border-radius:999px;white-space:nowrap;border:1px solid}
+.b-s{color:var(--lime);border-color:rgba(185,255,74,.35);background:rgba(185,255,74,.08)}
+.b-w{color:var(--pink);border-color:rgba(255,79,174,.35);background:rgba(255,79,174,.08)}
+.b-l{color:var(--yellow);border-color:rgba(255,213,74,.35);background:rgba(255,213,74,.08)}
+.desc{color:#b4bdca;font-size:13.5px;line-height:1.85;margin:10px 0 14px;flex:1}
+.acts{display:flex;flex-wrap:wrap;gap:6px}
+.btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:9px;font:600 12.5px var(--f-body);color:var(--fg);
+  background:var(--graphite);border:1px solid var(--hair);text-decoration:none}
+.btn:hover{border-color:var(--hair-2);background:#151a25}
+.btn:focus-visible{outline:2px solid var(--cyan)}
+.btn .ico{width:15px;height:15px}
+.btn.on{color:var(--ink);background:var(--c);border-color:transparent}
+.btn.off{opacity:.5;cursor:default}
+.empty{text-align:center;color:var(--muted);padding:48px 0}
+
+/* builder & templates */
+.dock{margin-top:64px;scroll-margin-top:90px}
+.sec-title{display:flex;align-items:center;gap:12px;margin:0 0 16px}
+.sec-title h2{margin:0;font-size:24px;font-weight:900}
+.builder{display:grid;grid-template-columns:1fr 1.35fr;gap:14px}
+.builder>div{padding:18px;min-width:0}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.picked{display:flex;flex-wrap:wrap;gap:6px;min-height:40px}
+.pk{all:unset;cursor:pointer;padding:6px 10px;border-radius:9px;font:600 12px var(--f-mono);direction:ltr;color:var(--fg);background:var(--graphite-2);border:1px solid var(--hair-2)}
+.pk:hover{border-color:var(--pink);color:var(--pink)}
+.field{display:block;margin-top:12px}
+.field span{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.field input,.field textarea{width:100%;padding:11px 12px;border-radius:11px;border:1px solid var(--hair);color:var(--fg);font:500 14px var(--f-body);background:var(--ink);outline:0;resize:vertical}
+.field input:focus,.field textarea:focus{border-color:rgba(47,224,255,.45)}
+pre.out{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;unicode-bidi:plaintext;text-align:start;font:500 13.5px/1.95 var(--f-body);color:#e4e9f1;
+  padding:16px;border-radius:12px;background:var(--ink);border:1px solid var(--hair);min-height:300px}
+.tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.tpl{padding:18px;min-width:0}
+.tpl h3{margin:0;font-size:16.5px;display:flex;align-items:center;gap:10px}
+.tpl p{margin:0 0 12px;color:var(--muted);font-size:13px}
+.tpl pre.out{max-height:300px;overflow:auto;min-height:0}
+.upd{display:flex;align-items:center;gap:8px;margin:14px 0 0;font-size:12.5px;color:var(--muted)}
+.live{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+.machine{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.step{padding:18px;min-width:0}
+.step.wide{grid-column:1/-1}
+.step-h{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.step-h h3{margin:0;font-size:17px}
+.step-h small{color:var(--muted);font-size:12.5px}
+.sn{width:34px;height:34px;flex:none;border-radius:11px;display:grid;place-items:center;font-weight:900;color:var(--ink);background:var(--c);box-shadow:0 8px 20px -8px var(--c)}
+.cnt{font:600 12px var(--f-mono);color:var(--muted);margin-inline-start:4px}
+.types{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.type{all:unset;cursor:pointer;padding:7px 11px;border-radius:999px;font:600 12.5px var(--f-body);color:var(--fg);background:var(--graphite-2);border:1px solid var(--hair)}
+.type:hover{border-color:var(--hair-2)}
+.type:focus-visible,.pk:focus-visible,.rule:focus-visible{outline:2px solid var(--cyan)}
+.sugg{display:grid;gap:6px;max-height:420px;overflow:auto;padding-inline-end:2px}
+.sg{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;background:var(--ink);border:1px solid var(--hair)}
+.sg .dotc{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c);flex:none}
+.sg .nm{font:700 13px var(--f-mono);direction:ltr;color:#fff}
+.sg .why{font-size:12px;color:var(--muted);line-height:1.6}
+.sg .tx{min-width:0;flex:1}
+.sg .btn{flex:none;padding:6px 9px}
+.sg.core .nm::after{content:" پایه";font:600 10.5px var(--f-body);color:var(--dim)}
+.rules{display:flex;flex-wrap:wrap;gap:6px}
+.rule{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;max-width:100%;padding:7px 10px;border-radius:10px;font:500 12.5px/1.6 var(--f-body);color:var(--muted);background:var(--ink);border:1px solid var(--hair)}
+.rule i{width:14px;height:14px;flex:none;border-radius:4px;border:1.5px solid var(--dim);display:grid;place-items:center}
+.rule.on{color:var(--fg);border-color:rgba(185,255,74,.35)}
+.rule.on i{background:var(--lime);border-color:var(--lime)}
+.rule.on i::after{content:"";width:6px;height:3px;border:2px solid var(--ink);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.rule .x{margin-inline-start:4px;color:var(--dim);font-weight:700}
+.rule .x:hover{color:var(--pink)}
+.addrule,.save{display:flex;gap:8px;margin-top:12px}
+.addrule input,.save input,.field select{flex:1;min-width:0;padding:10px 12px;border-radius:11px;border:1px solid var(--hair);color:var(--fg);font:500 13.5px var(--f-body);background:var(--ink);outline:0}
+.field select{width:100%}
+.addrule input:focus,.save input:focus{border-color:rgba(47,224,255,.45)}
+.out-grid{display:grid;grid-template-columns:1fr 1.35fr;gap:16px;margin-top:6px}
+.btn.primary{color:var(--ink);background:var(--lime);border-color:transparent}
+.btn.primary:hover{background:#cbff6e}
+.btn.danger{color:var(--pink);border-color:rgba(255,79,174,.4)}
+@media (max-width:920px){.machine,.out-grid{grid-template-columns:1fr}}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,24px);opacity:0;transition:.22s;z-index:60;
+  padding:10px 18px;border-radius:12px;font:700 14px var(--f-body);color:var(--ink);background:var(--lime)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{margin-top:56px;color:var(--dim);font-size:12.5px;text-align:center;line-height:1.9}
+
+@media (max-width:920px){.hero{grid-template-columns:1fr}.scene{height:280px}.how{grid-template-columns:1fr 1fr}.builder{grid-template-columns:1fr}.cur{display:none}}
+@media (max-width:560px){.how{grid-template-columns:1fr}.tpls{grid-template-columns:1fr}.brand span{display:none}.stack{width:200px;height:250px}}
+@media (prefers-reduced-motion:reduce){.stack,.wave span{animation:none}.card,.drawer{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="bar">
+  <button class="iconbtn" id="menuBtn" aria-label="دسته‌ها" aria-expanded="false" aria-controls="drawer">
+    <svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+  </button>
+  <div class="brand"><div class="mark"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"/></svg></div><span>اطلس اسکیل</span></div>
+  <label class="search"><svg class="ico" viewBox="0 0 24 24" style="color:var(--muted)"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="جستجو: زیرنویس، دوربین، صدا…" aria-label="جستجو"></label>
+  <span class="cur" id="cur"></span>
+</header>
+
+<div id="shell">
+  <div class="scrim" id="scrim"></div>
+  <nav class="drawer" id="drawer" aria-label="دسته‌ها">
+    <h3>دسته‌ها</h3>
+    <div class="nav" id="nav"></div>
+    <div class="sep"></div>
+    <div class="nav">
+      <button data-jump="dock"><span class="tile" style="--c:var(--lime)"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></span>پرامپت‌ساز</button>
+      <button data-jump="tpls"><span class="tile" style="--c:var(--orange)"><svg class="ico" viewBox="0 0 24 24"><path d="M5 4h10l4 4v12H5z M14 4v5h5"/></svg></span>قالب‌های آماده</button>
+      <button id="clearSel"><span class="tile" style="--c:var(--pink)"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span>پاک کردن انتخاب‌ها</button>
+    </div>
+  </nav>
+</div>
+
+<section class="hero">
+  <div>
+    <div class="eyebrow">CLAUDE CODE · VIDEO &amp; MOTION SKILLS</div>
+    <h1>اطلس اسکیل‌های ساخت ویدیو</h1>
+    <p class="lead">هر اسکیلی که روی سیستمت نصبه، با توضیح و لینک گیت‌هاب. از منوی <b>☰</b> دسته رو انتخاب کن، روی «افزودن» ِ هر کارت بزن تا بره توی پرامپت‌ساز، یا یکی از قالب‌های پایین صفحه رو کپی کن.</p>
+    <div class="stats">
+      <div class="stat matte"><b id="sCount">0</b><span>اسکیل</span></div>
+      <div class="stat matte"><b id="sCats">0</b><span>دسته</span></div>
+      <div class="stat matte"><b id="sRepos">0</b><span>ریپوی گیت‌هاب</span></div>
+      <div class="stat matte"><b>۶</b><span>قالب پرامپت</span></div>
+    </div>
+    <p class="upd"><span class="live"></span>به‌روزرسانی: ۱۶ آبان ۱۴۰۵</p>
+  </div>
+  <div class="scene" aria-hidden="true">
+    <div class="stack">
+      <div class="pane" style="--c:var(--orange)">
+        <div class="lbl"><i></i>MOTION</div>
+        <div class="track"><span style="right:6%;width:42%"></span></div>
+        <div class="track"><span style="right:30%;width:55%"></span></div>
+        <div class="track"><span style="right:12%;width:28%"></span></div>
+        <div class="kf"><i></i><i></i><i></i></div>
+      </div>
+      <div class="pane" style="--c:var(--lime)">
+        <div class="lbl"><i></i>SOUND</div>
+        <div class="wave" id="wave"></div>
+      </div>
+      <div class="pane" style="--c:var(--cyan)">
+        <div class="lbl"><i></i>CAPTIONS</div>
+        <div class="track" style="--c:var(--violet)"><span style="right:0;width:70%"></span></div>
+        <div class="cap">زمان <em>متوقف</em> شد</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how"></section>
+
+<main id="list"></main>
+<div class="empty" id="empty" hidden>چیزی پیدا نشد. یه کلمه‌ی دیگه امتحان کن.</div>
+
+<section class="dock" id="dock">
+  <div class="sec-title"><span class="tile" style="--c:var(--lime)"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></span><h2>پرامپت‌ساز</h2></div>
+  <p class="lead" style="margin:-4px 0 18px">ویدیویی که می‌خوای بسازی رو توضیح بده. دستگاه اسکیل‌های لازم رو پیشنهاد می‌ده؛ تو انتخاب می‌کنی، قانون‌ها و بلوک‌های خودت رو اضافه می‌کنی، و پرامپت آماده تحویل می‌گیری.</p>
+  <div class="machine">
+    <div class="step matte">
+      <div class="step-h"><span class="sn" style="--c:var(--cyan)">۱</span><div><h3>ویدیو رو توضیح بده</h3><small>یه نوع رو بزن یا خودت بنویس؛ پیشنهادها همزمان عوض می‌شن.</small></div></div>
+      <div class="types" id="types"></div>
+      <label class="field" style="margin-top:12px"><span>توضیح ویدیو</span><textarea id="brief" rows="4">ریل اینفوگرافی با نریشن درباره‌ی مک‌بوک؛ عکس PNG محصول، موشن سینمایی با حرکت دوربین و ساند افکت تمیز</textarea></label>
+      <div class="row" style="margin:16px 0 10px"><b>پیشنهاد دستگاه <span class="cnt" id="suggN"></span></b><button class="btn" id="addAll"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>افزودن همه</button></div>
+      <div class="sugg" id="sugg"></div>
+    </div>
+
+    <div class="step matte">
+      <div class="step-h"><span class="sn" style="--c:var(--violet)">۲</span><div><h3>اسکیل‌ها و قانون‌ها</h3><small>اسکیل اصلی، اسکیل‌های انتخاب‌شده، و قانون‌هایی که باید رعایت بشن.</small></div></div>
+      <label class="field"><span>اسکیل اصلی (اول پرامپت)</span><input id="fMain" value="/motion-graphics" dir="ltr" style="font-family:var(--f-mono);text-align:right"></label>
+      <div class="row" style="margin:14px 0 8px"><b>انتخاب‌شده‌ها <span class="cnt" id="pickN"></span></b><small style="color:var(--muted)">برای حذف، روش بزن</small></div>
+      <div class="picked" id="picked"></div>
+      <div class="row" style="margin:18px 0 8px"><b>قانون‌ها و بلوک‌ها</b><small style="color:var(--muted)">روشن یا خاموش کن</small></div>
+      <div class="rules" id="rules"></div>
+      <div class="addrule">
+        <input id="ruleIn" placeholder="قانون یا بلوک خودت رو بنویس… (مثلاً: لوگوی دیجیاتو آخر ویدیو)" aria-label="قانون جدید">
+        <button class="btn" id="ruleAdd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>افزودن</button>
+      </div>
+    </div>
+
+    <div class="step gloss wide">
+      <div class="step-h"><span class="sn" style="--c:var(--lime)">۳</span><div><h3>پرامپت آماده</h3><small>ورودی‌ها رو پر کن، کپی کن، یا برای دفعه‌های بعد به‌عنوان قالب ذخیره کن.</small></div></div>
+      <div class="out-grid">
+        <div>
+          <label class="field"><span>ورودی‌ها</span><textarea id="fIn" rows="3">نریشن: [مسیر فایل] · متن: [متن اصلی] · عکس‌ها: [پوشه]</textarea></label>
+          <label class="field"><span>استایل</span><textarea id="fStyle" rows="2">1080x1920، سرمه‌ای/آبی/سفید، Vazirmatn، اعداد فارسی، گرافیک بالا و زیرنویس پایین</textarea></label>
+          <label class="field"><span>ترتیب کار</span><select id="fOrder"></select></label>
+          <div class="save">
+            <input id="tplName" placeholder="اسم قالب (مثلاً: ریل مک‌بوک)" aria-label="اسم قالب">
+            <button class="btn" id="saveTpl"><svg class="ico" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z M8 4v5h7V4 M8 20v-6h8v6"/></svg>ذخیره به‌عنوان قالب</button>
+          </div>
+        </div>
+        <div style="min-width:0">
+          <div class="row"><b>پرامپت</b><button class="btn primary" data-copy="#out"><svg class="ico" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>کپی پرامپت</button></div>
+          <pre class="out" id="out"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mineWrap" hidden>
+    <div class="sec-title" style="margin-top:48px"><span class="tile" style="--c:var(--pink)"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span><h2>قالب‌های من</h2></div>
+    <div class="tpls" id="mine"></div>
+  </div>
+
+  <div class="sec-title" id="tplsT" style="margin-top:48px;scroll-margin-top:90px"><span class="tile" style="--c:var(--orange)"><svg class="ico" viewBox="0 0 24 24"><path d="M5 4h10l4 4v12H5z M14 4v5h5"/></svg></span><h2>قالب‌های آماده</h2></div>
+  <div class="tpls" id="tpls"></div>
+</section>
+
+<footer>آخرین به‌روزرسانی صفحه: <b>۱۶ آبان ۱۴۰۵</b> · آخرین اسکیل‌های نصب‌شده: <b>۱۴ آبان ۱۴۰۵</b> (GSAP، بردهای توضیحی، better-sfx، klik، Lottie)<br>مسیر نصب: <code>~/.claude/skills</code> · اسکیل‌های «محلی» روی سیستم خودت ساخته شدن و گیت‌هاب ندارن</footer>
+</div>
+<div class="toast" id="toast" role="status">کپی شد</div>
+
+<script>
+const R={
+ HF:"https://github.com/heygen-com/hyperframes", RM:"https://github.com/remotion-dev/skills",
+ MG:"https://github.com/charlie947/motion-graphics-skills", WG:"https://github.com/iart-ai/webgl-animation-skills",
+ TT:"https://github.com/iart-ai/tiktok-video-skills", GS:"https://github.com/greensock/gsap-skills",
+ KL:"https://github.com/t3knobox/klik-anim-skill-creation", LT:"https://github.com/LottieFiles/motion-design-skill",
+ YT:"https://github.com/sirioberati/YouTube-AI-Motion-Graphics", AN:"https://github.com/artemnovitckii/claude-animation-skills",
+ HK:"https://github.com/nateherkai/herk-edit-kit", SX:"https://github.com/devhims/better-sfx",
+ VS:"https://github.com/Vincentwei1021/video-shotcraft", VT:"https://github.com/Vincentwei1021/video-talkcraft",
+ AE:"https://github.com/Vincentwei1021/anything2explainer", MV:"https://github.com/echris6/motion-video-kit",
+ HW:"https://github.com/howseen-ai/claude-motion-design"
+};
+const CATS=[
+ {id:"start",t:"نقطه‌ی شروع",s:"اسکیل اصلی که کل ساخت ویدیو رو هدایت می‌کنه",i:"🚀",c:"#22e4ff"},
+ {id:"hf",t:"موتور HyperFrames",s:"قوانین ساخت، دوربین، افکت‌های آماده و میکس",i:"⚙️",c:"#8b6bff"},
+ {id:"motion",t:"حرکت و موشن",s:"افکت‌ها، reveal محصول و قوانین حرفه‌ای حرکت",i:"✨",c:"#ff3ea5"},
+ {id:"gsap",t:"GSAP",s:"موتور حرکتِ پشت HyperFrames",i:"🌀",c:"#b6ff3c"},
+ {id:"data",t:"داده و اینفوگرافی",s:"چارت، عدد، تایم‌لاین و بردهای توضیحی",i:"📊",c:"#ffd23f"},
+ {id:"3d",t:"سه‌بعدی و افکت",s:"Three.js، شیدر، ذرات",i:"🧊",c:"#22e4ff"},
+ {id:"reel",t:"ریلز، زیرنویس و خروجی",s:"قواعد ریلز، زیرنویس کلمه‌به‌کلمه و خروجی آپلود",i:"📱",c:"#ff8a1f"},
+ {id:"sound",t:"صدا",s:"ساند افکت، موزیک و میکس",i:"🔊",c:"#b6ff3c"},
+ {id:"remotion",t:"Remotion",s:"روش دوم ساخت ویدیو با React",i:"⚛️",c:"#8b6bff"},
+ {id:"cine",t:"ویدیوی سینمایی و توضیحی",s:"پایپ‌لاین‌های کامل با سیستم دوربین و کنترل کیفیت",i:"🎞️",c:"#ff3ea5"},
+ {id:"plan",t:"برنامه‌ریزی و پرامپت",s:"بریف، سیستم برند و تبدیل رفرنس",i:"🧭",c:"#ffd23f"},
+ {id:"edit",t:"تدوین فوتیج واقعی",s:"ویدیوی آدم‌دار، حذف سکوت و تپق",i:"✂️",c:"#ff8a1f"},
+ {id:"misc",t:"خاص و کم‌کاربرد",s:"برای کارهای خاص، یا با استایل دیجیاتو جور نیستن",i:"🧩",c:"#9aa3ae"}
+];
+// [name, cat, desc, repoKey, badge]  badge: s=پرکاربرد  w=مناسب نیست  l=محلی
+const S=[
+ ["hyperframes","start","ورودی عمومی هر ویدیو. پروژه رو بررسی می‌کنه و کار رو به مسیر مناسب می‌فرسته.","HF"],
+ ["motion-graphics","start","موشن‌گرافیک کوتاه و طراحی‌محور: تایپوی متحرک، عدد، چارت، نقشه. بهترین شروع برای ریل‌های PNG و اینفوگرافی.","HF","s"],
+ ["general-video","start","ویدیوهای بلندتر و چندصحنه‌ای، مونتاژ و ریل برند.","HF"],
+ ["faceless-explainer","start","ویدیوی توضیحی از روی یه متن یا مقاله، بدون فوتیج؛ تصویر هر صحنه با گرافیک ساخته می‌شه.","HF"],
+ ["product-launch-video","start","معرفی و پرومو ِ محصول از روی سایت، اسکریپت یا بریف.","HF"],
+ ["make-a-video","start","ساخت ویدیو از صفر برای مبتدی‌ها؛ اول یک‌جا سؤال می‌پرسه بعد می‌سازه.","HK"],
+ ["music-to-video","start","ویدیوی هماهنگ با بیت یه موزیک: لیریک، اسلایدشو، پرومو.","HF"],
+ ["slideshow","start","اسلاید و ارائه‌ی تعاملی با حالت ارائه‌دهنده؛ خروجیش ویدیو نیست.","HF"],
+
+ ["hyperframes-core","hf","قوانین پایه‌ی ساخت کامپوزیشن، زمان‌بندی و رندر قطعی. تقریباً همیشه لازمه.","HF","s"],
+ ["hyperframes-creative","hf","پالت، فونت، ترکیب‌بندی، فایل طراحی و حس کلی ویدیو.","HF"],
+ ["hyperframes-animation","hf","الگوی صحنه‌ها و ترنزیشن‌ها، به‌علاوه‌ی animation map برای پیدا کردن شات‌های ثابت.","HF","s"],
+ ["hyperframes-keyframes","hf","حرکت دوربین، زوم، punch-in، Ken Burns، mask و match-cut.","HF","s"],
+ ["hyperframes-registry","hf","حدود ۴۰۰ افکت و بلوک آماده (گلیچ، light sweep، چارت، مهر). قبل از ساخت دستی اینجا رو بگرده.","HF"],
+ ["hyperframes-audio","hf","میکس صدای داخل پروژه: fade، ducking موزیک زیر راوی، gain و افکت.","HF","s"],
+ ["hyperframes-cli","hf","دستورهای رندر، چک خطا، پیش‌نمایش و حذف پس‌زمینه‌ی عکس.","HF"],
+ ["hyperframes-studio","hf","کار تعاملی روی پروژه داخل استودیوی HyperFrames.","HF"],
+ ["hyperframes-video-beats","hf","گرافیک و کالاوت روی ویدیوهای بلند آدم‌دار (یوتیوب).","HK"],
+ ["remotion-to-hyperframes","hf","تبدیل یه پروژه‌ی Remotion به HyperFrames.","HF"],
+ ["website-to-hyperframes","hf","ضبط یه سایت و ساخت ویدیو از روی اون.","HK"],
+
+ ["motion-effects","motion","۱۶ افکت پریمیوم: chart morph، masked type، particle logo، تبدیل دکمه به پلیر و…","MG","s"],
+ ["apple-launch-film","motion","گرامر معرفی به سبک اپل: reveal آروم محصول، light sweep، روشن شدن لوگو.","MG","s"],
+ ["launch-video","motion","ویدیوی لانچ ۳۰ تا ۴۵ ثانیه‌ای با جمله‌ی تکه‌تکه و CTA.","MG"],
+ ["title-sequence-3d","motion","تیتراژ سه‌بعدی سینمایی برای شروع ویدیو.","MG"],
+ ["klik-anim","motion","قوانین حرفه‌ای حرکت المان‌ها: easing، ریتم، ضدتکرار، فضای خالی، چک‌لیست قبل از خروجی.","KL","s"],
+ ["klik-cam","motion","قوانین حرکت دوربین: push، dolly، orbit، پارالاکس و motion blur.","KL","s"],
+ ["lottie-motion-design","motion","اصول تایمینگ، easing و کوریوگرافی از تیم LottieFiles.","LT"],
+ ["motion-design","motion","موشن دیزاین ۱۰۰٪ با کد (HTML + Playwright + ffmpeg).","HW"],
+ ["motion-showreel","motion","شوریل ۱۰ تا ۳۰ ثانیه‌ای برند، هماهنگ با بیت.","HK"],
+ ["style-library","motion","کتابخونه‌ی استایل‌ها و کارت‌های گرافیکی آماده.","HK"],
+
+ ["gsap-timeline","gsap","ترتیب و زمان‌بندی دقیق حرکت‌ها؛ مهم‌ترین اسکیل GSAP برای ویدیو.","GS","s"],
+ ["gsap-core","gsap","پایه‌ی حرکت‌ها: to/from، easing، stagger.","GS"],
+ ["gsap-plugins","gsap","SplitText برای تیتر حرف‌به‌حرف، DrawSVG برای کشیدن خط، Flip.","GS"],
+ ["gsap-utils","gsap","ابزارهای کمکی: clamp، mapRange، snap، random.","GS"],
+ ["gsap-performance","gsap","روان بودن حرکت و جلوگیری از لگ.","GS"],
+ ["gsap","gsap","مرجع قدیمی‌تر GSAP برای HyperFrames.","HK"],
+ ["gsap-react","gsap","GSAP در React؛ برای سایت‌سازیه.","GS","w"],
+ ["gsap-frameworks","gsap","GSAP در Vue و Svelte؛ برای سایت‌سازیه.","GS","w"],
+ ["gsap-scrolltrigger","gsap","انیمیشن وابسته به اسکرول؛ برای سایت‌سازیه.","GS","w"],
+
+ ["animated-chart","data","چارت متحرک (میله، خط، count-up). عدد از خودش نمی‌سازه.","MG","s"],
+ ["explainer-board-system","data","۷۴ برد آماده: تایم‌لاین، VS، چک‌لیست، هیت‌مپ. باید برای ۹:۱۶ و تم سرمه‌ای تنظیم بشه.","YT"],
+ ["explainer-board-brief","data","تعیین این‌که روی هر برد چی بیاد.","YT"],
+ ["board-sync","data","هماهنگ کردن بردها با صدای راوی و رندر.","YT"],
+ ["countdown-video","data","شمارش معکوس و ورق خوردن عدد (مثلاً سال).","TT"],
+ ["milestone-reveal","data","عدد بزرگی که از ذرات ساخته می‌شه.","MG"],
+ ["graph","data","نمودار خطی ساده با عدد شمارنده؛ حدود ۱۰ ثانیه رندر.","AN"],
+
+ ["threejs-animation","3d","صحنه و مدل سه‌بعدی، حرکت دوربین، bloom و DOF.","WG"],
+ ["shader-glsl","3d","light sweep، نور متحرک، ترنزیشن گلیچ، سطح مایع (مثل نفت).","WG"],
+ ["particle-system","3d","ذرات، جرقه، دود، شبکه‌ی نقطه‌ای.","WG"],
+ ["breakdown","3d","گوشی سه‌بعدی که لایه‌لایه باز می‌شه و قطعه‌هاش برچسب می‌گیرن.","AN"],
+ ["map-route","3d","نقشه‌ی سه‌بعدی شهر با مسیر و پین.","AN"],
+
+ ["short-form-video","reel","قواعد ریلز: هوک ۳ ثانیه، ریتم کات، لوپ و safe area ِ ۹:۱۶.","TT","s"],
+ ["caption-animation","reel","زیرنویس کلمه‌به‌کلمه با هایلایت کلمه‌ی فعال.","TT","s"],
+ ["remotion-captions","reel","زیرنویس و زمان‌بندی کلمه‌ها در Remotion.","RM"],
+ ["embedded-captions","reel","زیرنویس سینمایی روی ویدیوی آدم‌دار (مثلاً پشت سر سوژه).","HF"],
+ ["lower-thirds","reel","اسم و عنوان پایین کادر، کارت نقل‌قول.","TT"],
+ ["reel-export","reel","خروجی نهایی ریلز: کدک درست، بلندی صدا و چک قبل از آپلود.","MG","s"],
+
+ ["better-sfx","sound","۱۶۱ ساند افکت تمیز و هم‌سطح: whoosh، pop، کلیک، تیک، ورق، چیم.","SX","s"],
+ ["media-use","sound","پیدا کردن موزیک، SFX، عکس و آیکون، به‌علاوه‌ی حذف پس‌زمینه.","HF","s"],
+
+ ["remotion-best-practices","remotion","راهنمای اصلی Remotion؛ می‌گه کدوم زیراسکیل رو بخونی.","RM"],
+ ["remotion-create","remotion","ساخت پروژه‌ی جدید Remotion.","RM"],
+ ["remotion-render","remotion","خروجی گرفتن از Remotion.","RM"],
+ ["remotion-studio","remotion","پیش‌نمایش در استودیوی Remotion.","RM"],
+ ["remotion-markup","remotion","اصول محتوا، انیمیشن و افکت در Remotion.","RM"],
+ ["remotion-maps","remotion","انیمیشن نقشه.","RM"],
+ ["remotion-multimedia","remotion","کار با فایل‌های صوتی و تصویری (Mediabunny).","RM"],
+ ["remotion-docs","remotion","جستجو در مستندات Remotion.","RM"],
+ ["remotion-upgrade","remotion","آپدیت نسخه‌ی Remotion.","RM"],
+ ["klik-remotion-method","remotion","روش کامل ساخت ویدیو با Remotion، از بریف تا خروجی.","KL"],
+ ["remotion-interactivity","remotion","تعامل در Remotion؛ برای اپ‌سازیه.","RM","w"],
+ ["remotion-saas","remotion","ساخت اپ با Remotion؛ برای اپ‌سازیه.","RM","w"],
+
+ ["video-talkcraft","cine","ویدیوی توضیحی با صدای راوی و سیستم دوربین ضد اسلایدشو. برای فارسی زمان‌بندی رو با Whisper بده.","VT","s"],
+ ["video-storytelling","cine","یه دنیای پیوسته که دوربین توش حرکت می‌کنه، به‌جای صحنه‌های جدا.","HK"],
+ ["video-shotcraft","cine","ویدیوی محصول با ۱۲۴ کارت شات و حرکت دوربین ۲.۵ بعدی.","VS"],
+ ["anything2explainer","cine","موضوع بدی، ویدیوی توضیحی کامل بگیری (برای چینی و انگلیسی ساخته شده).","AE"],
+ ["business-motion-film","cine","تبلیغ حرفه‌ای با حلقه‌ی منتقد مستقل؛ کیفیت بالا، ولی کند.","MV"],
+ ["vox-explainer","cine","سبک Vox با کاغذ پاره و هاف‌تون؛ با استایل دیجیاتو جور نیست.","MG","w"],
+
+ ["reference-to-motion","plan","تبدیل یه ویدیوی رفرنس به پرامپت؛ بهترین راه برای «یه چیزی شبیه این بساز».","MG","s"],
+ ["brand-intake","plan","ساخت سیستم طراحی برند (MOTION.md) که همه‌ی ویدیوها ازش پیروی کنن.","MG"],
+ ["motion-brief-writer","plan","تبدیل ایده‌ی خام به بریف دقیق؛ عدد از خودش نمی‌سازه.","MG"],
+ ["motion-prompt-writer","plan","نوشتن پرامپت ۸ بخشی موشن.","MG"],
+
+ ["short-form-edit","edit","تدوین ریلز از فیلم خام آدم‌دار.","HK"],
+ ["edit-video","edit","تدوین کامل ویدیوی بلند آدم‌دار.","HK"],
+ ["cut-silences","edit","حذف سکوت‌ها؛ برای تند کردن ریتم نریشن هم به کار میاد.","HK"],
+ ["cut-mistakes","edit","حذف تپق، تکرار و جمله‌های دوباره‌گفته‌شده.","HK"],
+ ["talking-head-recut","edit","گرافیک و کارت روی ویدیوی مصاحبه یا پادکست.","HF"],
+
+ ["tech-news-studio-reel","misc","پایپ‌لاین استودیوی سه‌بعدی اخبار دیجیاتو که روی سیستم خودت ساخته شده.",null,"l"],
+ ["studio-reel-motion","misc","لایه‌ی Remotion همون پایپ‌لاین استودیو.",null,"l"],
+ ["logo-design","misc","طراحی لوگو و هویت بصری، از بریف تا فایل نهایی.",null],
+ ["logo-designer","misc","طراحی و اصلاح لوگو با SVG.",null],
+ ["minimalistic-graphics","misc","لاین‌آرت مینیمال سیاه و سفید با یه نقطه‌ی متحرک.","AN"],
+ ["loop-cover","misc","کاور GIF لوپ‌شونده برای خبرنامه.","MG"],
+ ["newsletter-promo","misc","پرومو ۱۲ تا ۲۰ ثانیه‌ای برای خبرنامه.","MG"],
+ ["model-showdown","misc","مقایسه‌ی سه مدل هوش مصنوعی کنار هم.","MG"],
+ ["figma","misc","وارد کردن طرح و برند از فیگما.","HF"],
+ ["pr-to-video","misc","ویدیو از روی یه PR ِ گیت‌هاب.","HF"],
+ ["stick-figure","misc","توضیحی کارتونی با آدمک؛ با استایل دیجیاتو جور نیست.","AN","w"],
+ ["zach-d-films","misc","توضیحی سه‌بعدی کارتونی؛ با استایل دیجیاتو جور نیست.","AN","w"]
+];
+const TPL=[
+ {t:"ریل اینفوگرافی و PNG",i:"📊",c:"#ffd23f",d:"مثل ریل نفت، تک هفتگی و مک‌بوک.",p:`/motion-graphics
+یه ریل دیجیاتو درباره‌ی [موضوع] بساز؛ فقط موشن‌گرافیک و عکس PNG، بدون کلیپ ویدیویی.
+نریشن: [مسیر فایل] — با Whisper (‎-l fa) زمان کلمه‌ها رو بگیر.
+متن زیرنویس: [متن اصلی] — Whisper فقط برای زمان‌بندی.
+
+استایل: 1080x1920، سرمه‌ای/آبی/سفید، Vazirmatn، اعداد فارسی، گرافیک بالا و زیرنویس پایین، بدون آدم.
+
+اسکیل‌ها (SKILL.md هر کدوم رو بخون):
+/hyperframes-core /hyperframes-keyframes /gsap-timeline /klik-anim /klik-cam
+/motion-effects /apple-launch-film /animated-chart /media-use /better-sfx
+/hyperframes-audio /caption-animation /reel-export
+
+قانون‌ها:
+- محصول PNG ِ دوربری‌شده و بزرگ (حداقل ۷۰٪ عرض کادر).
+- هیچ تصویری بیشتر از ۳ ثانیه ثابت نمونه؛ دوربین همیشه در حرکت.
+- هر لحظه فقط یک متن روی موشن (حداکثر ۴ کلمه) جدا از زیرنویس.
+- هیچ عددی خارج از متن نیار.
+
+ترتیب: PNG ها و contact sheet ← رندر کامل ← animation map و اصلاح ← خروجی ‎-14 LUFS.`},
+ {t:"ویدیوی علمی با نریشن",i:"🔬",c:"#22e4ff",d:"مثل ماکارونی و توقف زمان.",p:`/motion-graphics
+یه ریل علمی دیجیاتو بساز: «[عنوان]».
+نریشن: [مسیر فایل] · متن: [متن نریشن]
+
+اسکیل‌ها (SKILL.md هر کدوم رو بخون):
+/video-storytelling /hyperframes-core /hyperframes-keyframes /gsap-timeline /klik-cam
+/explainer-board-system /shader-glsl /particle-system /better-sfx /hyperframes-audio
+/caption-animation /reel-export
+
+- هر مفهوم یه دیاگرام متحرک داشته باشه (نه فقط متن).
+- یه دنیای پیوسته که دوربین بین مفهوم‌ها حرکت می‌کنه.
+- ادعای علمی فقط از متن؛ هر جا مطمئن نیستی بپرس.
+- سرمه‌ای/آبی/سفید، بدون آدم، زیرنویس کلمه‌به‌کلمه پایین.
+
+ترتیب: استوری‌بورد کوتاه ← رندر کامل draft ← اصلاح ← خروجی نهایی.`},
+ {t:"ریل خبری هفتگی",i:"📰",c:"#ff8a1f",d:"خبرهای تک یا خودرو در یک ریل.",p:`/motion-graphics
+ریل خبرهای هفته‌ی [تک/خودرو] برای دیجیاتو؛ فقط موشن و PNG.
+نریشن: [مسیر فایل] · خبرها و منابع: [فایل یا متن]
+
+اسکیل‌ها: /short-form-video /hyperframes-keyframes /gsap-timeline /klik-cam /motion-effects
+/apple-launch-film /animated-chart /lower-thirds /countdown-video /media-use /better-sfx
+/hyperframes-audio /caption-animation /reel-export
+
+- هر خبر حداقل ۲ شات با چیدمان متفاوت؛ دو شات پشت‌سرهم یه قالب نداشته باشن.
+- بین بخش‌ها کارت عنوان کوتاه (۱، ۲، ۳ — بدون صفر).
+- کلمه‌های لاتین پشت‌سرهم (مثل SK Hynix، RTX 50) در زیرنویس یه توکن LTR باشن.
+- صدای تمیز و مینیمال؛ بدون صداهای فضایی و موشکی.`},
+ {t:"«یه چیزی شبیه این بساز»",i:"🎯",c:"#ff3ea5",d:"وقتی یه رفرنس دیدی و حسش رو می‌خوای.",p:`/reference-to-motion
+این رفرنس رو بشکن و برای موضوع من یه پرامپت موشن بنویس، بعد بساز:
+رفرنس: [لینک یا اسکرین‌شات‌ها]
+موضوع من: [موضوع] · نریشن: [مسیر فایل]
+
+بعد از نوشتن پرامپت، با /motion-graphics بساز و از این‌ها کمک بگیر:
+/hyperframes-keyframes /klik-anim /klik-cam /motion-effects /better-sfx /reel-export
+
+- حس، ریتم و نوع حرکت از رفرنس؛ رنگ‌ها و فونت از استایل دیجیاتو.
+- اول خلاصه‌ی شکستن رفرنس رو نشونم بده.`},
+ {t:"اصلاح ویدیوی ساخته‌شده",i:"🛠️",c:"#b6ff3c",d:"وقتی ویدیو رو دیدی و ایراد داری.",p:`ویدیوی [مسیر پروژه / فایل خروجی] رو اصلاح کن. بقیه‌ی ویدیو دست نخوره.
+
+ایرادها:
+- ثانیه‌ی [..]: [چی خرابه] ← [چی می‌خوای]
+- ثانیه‌ی [..]: [چی خرابه] ← [چی می‌خوای]
+
+اسکیل‌ها: /hyperframes-keyframes /klik-anim /klik-cam /gsap-timeline
+/hyperframes-animation /better-sfx /hyperframes-audio /caption-animation
+
+ترتیب: اول فقط بازه‌های اصلاح‌شده رو جدا رندر کن و بفرست ← بعد از تأیید، خروجی کامل.`},
+ {t:"ریتم و صدا",i:"🔊",c:"#8b6bff",d:"وقتی ویدیو کنده یا صداهاش بده.",p:`ریتم و صدای ویدیوی [مسیر] رو بهتر کن:
+
+/cut-silences — سکوت‌های بیشتر از ۰.۳ ثانیه در نریشن کوتاه بشن.
+/short-form-video — هر شات حداکثر ۲ تا ۳ ثانیه، کات روی ضرب موزیک.
+/better-sfx — برای هر ورود، ترنزیشن، شمارش و مهر یه صدای تمیز.
+/hyperframes-audio — موزیک زیر صدای راوی duck بشه؛ SFX واضح ولی زیر صدا.
+/reel-export — خروجی ‎-14 LUFS.
+
+هیچ صدای فضایی، موشکی یا اغراق‌شده نباشه.`}
+];
+
+
+const ICON={
+ start:'<path d="M7 4l13 8-13 8z"/>',
+ hf:'<path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"/>',
+ motion:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z M19 16v4M17 18h4"/>',
+ gsap:'<path d="M4 19C9 19 9 5 20 5"/><circle cx="4" cy="19" r="1.6"/><circle cx="20" cy="5" r="1.6"/>',
+ data:'<path d="M5 20V11M12 20V5M19 20v-7M3 20h18"/>',
+ "3d":'<path d="M12 2.5l8.5 4.75v9.5L12 21.5l-8.5-4.75v-9.5z M12 12l8.5-4.75 M12 12v9.5 M12 12L3.5 7.25"/>',
+ reel:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+ sound:'<path d="M3 12h2M7 8v8M11 4v16M15 7v10M19 10v4"/>',
+ remotion:'<path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/>',
+ cine:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/>',
+ plan:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+ edit:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.6 7.6L20 18M8.6 16.4L20 6"/>',
+ misc:'<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>'
+};
+const svg=(k,st="")=>`<svg class="ico" viewBox="0 0 24 24" ${st}>${ICON[k]}</svg>`;
+const I={copy:'<svg class="ico" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
+ git:'<svg class="ico" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.7.3 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>',
+ plus:'<svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+ check:'<svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'};
+const HOW=[
+ {c:"var(--cyan)",k:"plan",t:"اسکیل چیه؟",p:"یه پوشه با فایل <code>SKILL.md</code> که دستورالعمل یه کار رو داره. کلاد اون رو می‌خونه و طبقش کار می‌کنه."},
+ {c:"var(--lime)",k:"remotion",t:"چطور صداش کنم؟",p:"اول پیام بنویس <code>/اسم</code>، یا اسمش رو توی جمله بیار. راه اول دقیق‌تره."},
+ {c:"var(--orange)",k:"hf",t:"یکی اصلی، بقیه کمکی",p:"یه اسکیل هدایت کار رو بگیره (مثلاً <code>/motion-graphics</code>) و بقیه برای حرکت، صدا و زیرنویس کمک کنن."},
+ {c:"var(--pink)",k:"edit",t:"بگو «بخونش»",p:"توی پرامپت بنویس «SKILL.md هر کدوم رو بخون و طبقش برو» و ترتیب کار و قانون‌ها رو مشخص کن."}];
+const TPLICO=["data","3d","reel","plan","edit","sound"];
+
+const $=s=>document.querySelector(s), FA=n=>String(n).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]);
+const picked=new Set(["hyperframes-core","hyperframes-keyframes","gsap-timeline","better-sfx","caption-animation","reel-export"]);
+let cat="all";
+
+function render(){
+  const q=$("#q").value.trim().toLowerCase(); let shown=0, html="";
+  for(const c of CATS){
+    if(cat!=="all"&&cat!==c.id) continue;
+    const items=S.filter(s=>s[1]===c.id&&(!q||s[0].toLowerCase().includes(q)||s[2].toLowerCase().includes(q)));
+    if(!items.length) continue; shown+=items.length;
+    html+=`<section class="cat" id="c-${c.id}" style="--c:${c.c}"><div class="cat-head"><span class="tile">${svg(c.id)}</span><div><h2>${c.t}</h2><small>${c.s} · ${FA(items.length)} اسکیل</small></div></div><div class="cards">`;
+    for(const [n,,d,rk,b] of items){
+      const badge=b==="s"?'<span class="badge b-s">پرکاربرد</span>':b==="w"?'<span class="badge b-w">به کارت نمیاد</span>':b==="l"?'<span class="badge b-l">محلی</span>':"";
+      const link=rk?`<a class="btn" href="${R[rk]}" target="_blank" rel="noopener">${I.git}گیت‌هاب</a>`:`<span class="btn off">بدون لینک</span>`;
+      const on=picked.has(n);
+      html+=`<article class="card" style="--c:${c.c}"><div class="top"><span class="dotc"></span><span class="name">/${n}</span>${badge}</div><p class="desc">${d}</p>
+      <div class="acts"><button class="btn ${on?"on":""}" data-add="${n}" aria-pressed="${on}">${on?I.check+"اضافه شد":I.plus+"افزودن"}</button>
+      <button class="btn" data-text="/${n}">${I.copy}کپی</button>${link}</div></article>`;
+    }
+    html+="</div></section>";
+  }
+  $("#list").innerHTML=html; $("#empty").hidden=!!shown; tilt();
+  const cc=CATS.find(c=>c.id===cat); $("#cur").innerHTML=cc?`دسته: <b>${cc.t}</b>`:`<b>${FA(S.length)}</b> اسکیل`;
+}
+function nav(){
+  const count=id=>S.filter(s=>s[1]===id).length;
+  $("#nav").innerHTML=`<button data-cat="all" class="${cat==="all"?"on":""}"><span class="tile" style="--c:var(--silver)">${svg("misc")}</span>همه‌ی اسکیل‌ها<span class="n">${FA(S.length)}</span></button>`+
+   CATS.map(c=>`<button data-cat="${c.id}" class="${cat===c.id?"on":""}"><span class="tile" style="--c:${c.c}">${svg(c.id)}</span>${c.t}<span class="n">${FA(count(c.id))}</span></button>`).join("");
+}
+/* ---------- the machine ---------- */
+const CORE=[["hyperframes-core","پایه‌ی ساخت هر ریل"],["hyperframes-keyframes","حرکت دوربین و ترنزیشن"],["gsap-timeline","زمان‌بندی دقیق حرکت‌ها"],["reel-export","خروجی درست برای اینستاگرام"]];
+const ENGINE=[
+ [/نریشن|راوی|گوینده|ویس|voice|صدای من|خوندن متن/i,["caption-animation","remotion-captions","hyperframes-audio"],"نریشن داره: زیرنویس کلمه‌به‌کلمه و میکس زیر صدا"],
+ [/زیرنویس|کپشن|caption/i,["caption-animation","remotion-captions"],"زیرنویس کلمه‌به‌کلمه"],
+ [/اینفوگراف|آمار|عدد|چارت|نمودار|درصد|داده|رتبه|مقایسه/i,["animated-chart","explainer-board-system","motion-effects"],"داده و عدد: چارت متحرک و برد مقایسه"],
+ [/سال|تاریخ|تایم.?لاین|تاریخچه|شمارش/i,["countdown-video","explainer-board-system"],"زمان و تاریخ: تایم‌لاین و ورق خوردن سال"],
+ [/محصول|گوشی|موبایل|لپ.?تاپ|مک|آیفون|ایرپاد|هدفون|ماشین|خودرو|png|عکس/i,["media-use","apple-launch-film","motion-effects"],"محصول: PNG تمیز و reveal به سبک اپل"],
+ [/موشن|حرکت|سینمایی|دوربین|خفن|حرفه.?ای/i,["klik-anim","klik-cam","hyperframes-animation"],"موشن حرفه‌ای: قوانین حرکت و دوربین"],
+ [/سه.?بعدی|3d|سه بعدی/i,["threejs-animation","breakdown"],"سه‌بعدی"],
+ [/نور|درخشش|لوگو|براق|مایع|نفت|شیشه|گلیچ/i,["shader-glsl"],"نور، درخشش و سطح مایع"],
+ [/ذرات|dna|کوانتوم|فضا|ستاره|کهکشان|اتم/i,["particle-system","shader-glsl"],"ذرات و افکت علمی"],
+ [/علمی|توضیحی|فیزیک|مفهوم|چرا|چطور|مقاله/i,["video-storytelling","explainer-board-system","video-talkcraft"],"توضیحی: یه دنیای پیوسته و دیاگرام"],
+ [/خبر|هفتگی|اخبار|هفته/i,["short-form-video","lower-thirds","countdown-video"],"خبری: ریتم ریلز و اسم محصول‌ها"],
+ [/ریل|اینستا|شورت|تیک.?تاک|reel/i,["short-form-video"],"قواعد ریلز: هوک، ریتم، لوپ"],
+ [/ساند|افکت صوتی|sfx|صدا/i,["better-sfx","hyperframes-audio"],"ساند افکت تمیز و میکس"],
+ [/موزیک|آهنگ|بیت|music/i,["music-to-video","hyperframes-audio"],"هماهنگ با موزیک"],
+ [/رفرنس|شبیه|مثل این|مثل اون|reference/i,["reference-to-motion"],"رفرنس داری: اول شکستن رفرنس"],
+ [/اصلاح|ایراد|درست کن|بهتر کن|خراب/i,["hyperframes-animation","klik-anim"],"اصلاح: بررسی کل حرکت‌ها"],
+ [/کند|ریتم|سریع|تند/i,["cut-silences","short-form-video"],"ریتم: حذف سکوت و کات سریع‌تر"],
+ [/فوتیج|مصاحبه|پادکست|آدم|خودم جلوی دوربین|talking|ولاگ/i,["short-form-edit","cut-silences","cut-mistakes","embedded-captions"],"فوتیج آدم‌دار: تدوین و زیرنویس"],
+ [/لانچ|معرفی|پرومو|تبلیغ|تیزر/i,["launch-video","product-launch-video","apple-launch-film"],"معرفی و پرومو"],
+ [/تیتراژ|اینترو|شروع سینمایی/i,["title-sequence-3d"],"تیتراژ سینمایی"],
+ [/نقشه|کشور|مسیر|شهر/i,["motion-graphics","map-route"],"نقشه‌ی متحرک"],
+ [/برند|هویت|سبک ثابت/i,["brand-intake"],"سیستم برند ثابت"],
+ [/تیتر|تایپوگراف|متن متحرک|kinetic/i,["motion-effects","gsap-plugins"],"تایپوگرافی متحرک"]
+];
+const MAINS=[[/فوتیج|مصاحبه|پادکست|ولاگ|خودم جلوی دوربین/i,"/short-form-edit"],[/رفرنس|شبیه|مثل این/i,"/reference-to-motion"],[/موزیک|آهنگ|بیت/i,"/music-to-video"],[/اصلاح|ایراد|درست کن/i,""]];
+const BUILTIN=[
+ ["style","استایل دیجیاتو: فقط سرمه‌ای/آبی/سفید، بدون آدم و کاراکتر",1],
+ ["png","محصول PNG ِ دوربری‌شده و بزرگ (حداقل ۷۰٪ عرض کادر)",1],
+ ["still","هیچ تصویری بیشتر از ۳ ثانیه ثابت نمونه؛ دوربین همیشه در حرکت",1],
+ ["onetext","هر لحظه فقط یک متن روی موشن (حداکثر ۴ کلمه) جدا از زیرنویس",1],
+ ["facts","هیچ عدد یا ادعایی خارج از متن نیار؛ هر جا مطمئن نیستی بپرس",1],
+ ["ltr","کلمه‌های لاتین پشت‌سرهم در زیرنویس یه توکن LTR باشن (مثل SK Hynix)",0],
+ ["sfx","صدای تمیز و مینیمال؛ بدون صدای فضایی و موشکی، همه زیر صدای راوی",0],
+ ["lufs","خروجی نهایی ‎-14 LUFS با /reel-export",0],
+ ["layout","دو شات پشت‌سرهم هیچ‌وقت یه چیدمان نداشته باشن",0],
+ ["fast","اول تخمین زمان بده؛ سقف حدود ۳۰ دقیقه، اگه بیشتر شد ساده‌ترش کن",0]
+];
+const ORDERS=["رندر کامل draft ← animation map و اصلاح ← خروجی نهایی",
+ "PNG ها و contact sheet ← رندر کامل ← animation map و اصلاح ← خروجی نهایی",
+ "اول استوری‌بورد و ۳ فریم نمونه ← بعد از تأیید من، رندر کامل ← خروجی نهایی",
+ "اول فقط بازه‌های اصلاح‌شده رو جدا رندر کن و بفرست ← بعد از تأیید، خروجی کامل"];
+const TYPES=[["اینفوگرافی با PNG","ریل اینفوگرافی با نریشن؛ عکس PNG محصول، عدد و چارت متحرک، موشن سینمایی و ساند افکت تمیز"],
+ ["علمی با نریشن","ویدیوی علمی و توضیحی با نریشن؛ دیاگرام متحرک برای هر مفهوم، ذرات و نور، زیرنویس کلمه‌به‌کلمه"],
+ ["خبری هفتگی","ریل خبرهای هفته با نریشن؛ برای هر خبر عکس PNG محصول، اسم محصول و عدد مهم، ریتم سریع"],
+ ["معرفی محصول","ویدیوی معرفی و لانچ محصول به سبک اپل؛ reveal محصول، نور و درخشش لوگو، تیتر متحرک"],
+ ["شبیه یه رفرنس","یه ویدیو شبیه این رفرنس می‌خوام برای موضوع خودم، با نریشن"],
+ ["اصلاح ویدیو","ویدیوی ساخته‌شده رو اصلاح کن؛ چند ایراد در موشن، عکس‌ها و ریتم داره"],
+ ["فوتیج آدم‌دار","تدوین ریلز از فوتیج خودم جلوی دوربین؛ حذف سکوت و تپق، زیرنویس و گرافیک"]];
+
+const store={k:"atlas.v1",get(){try{return JSON.parse(localStorage.getItem(this.k))||{}}catch(e){return{}}},set(v){try{localStorage.setItem(this.k,JSON.stringify(v))}catch(e){}}};
+const ST=Object.assign({custom:[],tpls:[],ruleOn:{}},store.get());
+const save=()=>store.set({custom:ST.custom,tpls:ST.tpls,ruleOn:ST.ruleOn});
+const ruleIsOn=r=>r[0] in ST.ruleOn?ST.ruleOn[r[0]]:!!r[2];
+let sugg=[], mainTouched=false;
+
+function suggest(){
+  const b=$("#brief").value, seen=new Map();
+  CORE.forEach(([n,w])=>seen.set(n,{w,core:1}));
+  for(const [re,list,why] of ENGINE) if(re.test(b)) list.forEach(n=>{if(!seen.has(n))seen.set(n,{w:why})});
+  sugg=[...seen].map(([n,v])=>({n,...v}));
+  if(!mainTouched){let m="/motion-graphics";for(const [re,v] of MAINS) if(re.test(b)){m=v;break}$("#fMain").value=m}
+  const catOf=n=>{const s=S.find(x=>x[0]===n);return CATS.find(c=>c.id===(s&&s[1]))||{c:"#9aa3ae"}};
+  $("#sugg").innerHTML=sugg.map(s=>{const on=picked.has(s.n);return `<div class="sg ${s.core?"core":""}" style="--c:${catOf(s.n).c}"><span class="dotc"></span><div class="tx"><div class="nm">/${s.n}</div><div class="why">${s.w}</div></div>
+   <button class="btn ${on?"on":""}" data-add="${s.n}" aria-pressed="${on}" style="--c:${catOf(s.n).c}">${on?I.check:I.plus}</button></div>`}).join("");
+  $("#suggN").textContent=FA(sugg.length);
+}
+function rules(){
+  const all=[...BUILTIN.map(r=>({id:r[0],t:r[1],on:ruleIsOn(r)})),...ST.custom.map((r,i)=>({id:"c"+i,t:r.t,on:r.on,c:i}))];
+  $("#rules").innerHTML=all.map(r=>`<button class="rule ${r.on?"on":""}" data-rule="${r.id}" aria-pressed="${r.on}"><i></i><span>${r.t.replace(/</g,"&lt;")}</span>${r.c!==undefined?`<span class="x" data-delrule="${r.c}" title="حذف">✕</span>`:""}</button>`).join("");
+  return all.filter(r=>r.on).map(r=>r.t);
+}
+function build(){
+  $("#picked").innerHTML=[...picked].map(n=>`<button class="pk" data-rm="${n}">/${n} ✕</button>`).join("")||'<small style="color:var(--muted)">هنوز چیزی انتخاب نشده؛ از پیشنهادها یا کارت‌ها اضافه کن.</small>';
+  $("#pickN").textContent=FA(picked.size);
+  const on=rules();
+  const sk=[...picked].map(n=>{const s=S.find(x=>x[0]===n);return `- /${n}: ${s?s[2].split(/[.؛]/)[0]:""}`}).join("\n");
+  const main=$("#fMain").value.trim();
+  $("#out").textContent=`${main?main+"\n":""}${$("#brief").value.trim()}
+ورودی‌ها: ${$("#fIn").value.trim()}
+استایل: ${$("#fStyle").value.trim()}
+
+اسکیل‌ها (قبل از هر مرحله SKILL.md همون رو بخون و طبقش برو):
+${sk||"- …"}
+
+قانون‌ها:
+${on.map(t=>"- "+t).join("\n")||"- …"}
+
+ترتیب کار: ${$("#fOrder").value}`;
+}
+function machine(){suggest();build()}
+function mine(){
+  $("#mineWrap").hidden=!ST.tpls.length;
+  $("#mine").innerHTML=ST.tpls.map((t,k)=>`<div class="tpl matte"><div class="row"><h3><span class="tile" style="--c:var(--pink)">${svg("plan")}</span>${t.n.replace(/</g,"&lt;")}</h3>
+   <div class="acts"><button class="btn" data-copy="#my${k}">${I.copy}کپی</button><button class="btn" data-load="${k}">بارگذاری</button><button class="btn danger" data-del="${k}">حذف</button></div></div>
+   <p>${t.d||""}</p><pre class="out" id="my${k}"></pre></div>`).join("");
+  ST.tpls.forEach((t,k)=>$("#my"+k).textContent=t.p);
+}
+function toast(msg){const o=$("#toast");o.textContent=msg;o.classList.add("show");clearTimeout(o._t);o._t=setTimeout(()=>o.classList.remove("show"),1400)}
+function machineInit(){
+  $("#types").innerHTML=TYPES.map((t,i)=>`<button class="type" data-type="${i}">${t[0]}</button>`).join("");
+  $("#fOrder").innerHTML=ORDERS.map(o=>`<option>${o}</option>`).join("");
+  $("#brief").addEventListener("input",machine);
+  $("#fMain").addEventListener("input",()=>{mainTouched=true;build()});
+  ["#fIn","#fStyle","#fOrder"].forEach(s=>$(s).addEventListener("input",build));
+  $("#ruleIn").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#ruleAdd").click()}});
+  machine();mine();
+}
+function statics(){
+  $("#how").innerHTML=HOW.map(h=>`<article class="matte"><span class="tile" style="--c:${h.c}">${svg(h.k)}</span><h3>${h.t}</h3><p>${h.p}</p></article>`).join("");
+  $("#tpls").innerHTML=TPL.map((t,k)=>`<div class="tpl ${k%2?"matte":"gloss"}"><div class="row"><h3><span class="tile" style="--c:${t.c}">${svg(TPLICO[k])}</span>${t.t}</h3>
+   <button class="btn" data-copy="#tp${k}">${I.copy}کپی</button></div><p>${t.d}</p><pre class="out" id="tp${k}"></pre></div>`).join("");
+  TPL.forEach((t,k)=>$("#tp"+k).textContent=t.p);
+  $("#wave").innerHTML=Array.from({length:14},(_,i)=>`<span style="height:${30+((i*37)%70)}%;animation-delay:${-i*.13}s"></span>`).join("");
+  $("#sCount").textContent=FA(S.length);$("#sCats").textContent=FA(CATS.length);$("#sRepos").textContent=FA(Object.keys(R).length);
+}
+function tilt(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches||matchMedia("(hover: none)").matches) return;
+  document.querySelectorAll(".card").forEach(el=>{
+    el.onmousemove=e=>{const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+      el.style.transform=`rotateY(${x*8}deg) rotateX(${-y*8}deg) translateZ(4px)`};
+    el.onmouseleave=()=>el.style.transform="";
+  });
+}
+function menu(open){document.getElementById("shell").classList.toggle("open",open);$("#menuBtn").setAttribute("aria-expanded",open)}
+async function copy(text){
+  try{await navigator.clipboard.writeText(text)}catch(e){const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(_){}t.remove()}
+  toast("کپی شد");
+}
+document.addEventListener("click",e=>{
+  const g=k=>e.target.closest(k);
+  if(g("#menuBtn")) return menu(true);
+  if(g("#scrim")) return menu(false);
+  const a=g("[data-add]"),c=g("[data-cat]"),r=g("[data-rm]"),t=g("[data-text]"),cp=g("[data-copy]"),j=g("[data-jump]");
+  if(a){const n=a.dataset.add;picked.has(n)?picked.delete(n):picked.add(n);render();machine()}
+  const ty=g("[data-type]"),ru=g("[data-rule]"),dr=g("[data-delrule]"),ld=g("[data-load]"),dl=g("[data-del]");
+  if(ty){$("#brief").value=TYPES[ty.dataset.type][1];mainTouched=false;machine()}
+  if(dr){ST.custom.splice(+dr.dataset.delrule,1);save();build();return}
+  if(ru){const id=ru.dataset.rule;if(id[0]==="c"){const r=ST.custom[+id.slice(1)];r.on=!r.on}else{const b=BUILTIN.find(x=>x[0]===id);ST.ruleOn[id]=!ruleIsOn(b)}save();build()}
+  if(g("#ruleAdd")){const v=$("#ruleIn").value.trim();if(v){ST.custom.push({t:v,on:true});$("#ruleIn").value="";save();build();toast("قانون اضافه شد")}}
+  if(g("#addAll")){sugg.forEach(s=>picked.add(s.n));render();machine();toast("همه‌ی پیشنهادها اضافه شد")}
+  if(g("#saveTpl")){const n=$("#tplName").value.trim()||("قالب "+FA(ST.tpls.length+1));
+    ST.tpls.unshift({n,d:$("#brief").value.trim().slice(0,90),p:$("#out").textContent,state:{picked:[...picked],main:$("#fMain").value,brief:$("#brief").value,inp:$("#fIn").value,style:$("#fStyle").value,order:$("#fOrder").value}});
+    $("#tplName").value="";save();mine();toast("قالب ذخیره شد")}
+  if(ld){const s=ST.tpls[+ld.dataset.load].state;picked.clear();s.picked.forEach(n=>picked.add(n));$("#fMain").value=s.main;mainTouched=true;$("#brief").value=s.brief;$("#fIn").value=s.inp;$("#fStyle").value=s.style;$("#fOrder").value=s.order;render();machine();document.getElementById("dock").scrollIntoView({behavior:"smooth"});toast("قالب بارگذاری شد")}
+  if(dl){if(dl.dataset.sure){ST.tpls.splice(+dl.dataset.del,1);save();mine();toast("قالب حذف شد")}else{dl.dataset.sure=1;dl.textContent="مطمئنی؟";setTimeout(()=>{if(dl.isConnected){delete dl.dataset.sure;dl.textContent="حذف"}},2500)}}
+  if(c){cat=c.dataset.cat;nav();render();menu(false);document.getElementById("list").scrollIntoView({behavior:"smooth"})}
+  if(j){menu(false);document.getElementById(j.dataset.jump==="tpls"?"tplsT":"dock").scrollIntoView({behavior:"smooth"})}
+  if(g("#clearSel")){picked.clear();render();machine();menu(false)}
+  if(r){picked.delete(r.dataset.rm);render();machine()}
+  if(t)copy(t.dataset.text);
+  if(cp)copy($(cp.dataset.copy).textContent);
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")menu(false)});
+$("#q").addEventListener("input",render);
+statics();nav();render();machineInit();
+</script>
+</body>
+</html>
