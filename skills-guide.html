@@ -332,7 +332,7 @@ footer{margin-top:56px;color:var(--dim);font-size:12.5px;text-align:center;line-
   <div class="tpls" id="tpls"></div>
 </section>
 
-<footer>آخرین به‌روزرسانی صفحه: <b>۲۵ آبان ۱۴۰۵</b> · آخرین اسکیل‌های نصب‌شده: <b>۲۵ آبان ۱۴۰۵</b> (animation-styles)<br>مسیر نصب: <code>~/.claude/skills</code> · اسکیل‌های «محلی» روی سیستم خودت ساخته شدن و گیت‌هاب ندارن</footer>
+<footer>آخرین به‌روزرسانی صفحه: <b>۲۵ آبان ۱۴۰۵</b> · آخرین اسکیل‌های نصب‌شده: <b>۲۵ آبان ۱۴۰۵</b> (claude-drawing، code-animation-prompts، dbc-animate، dbc-engine، dbc-hands و…)<br>مسیر نصب: <code>~/.claude/skills</code> · اسکیل‌های «محلی» روی سیستم خودت ساخته شدن و گیت‌هاب ندارن</footer>
 </div>
 <div class="toast" id="toast" role="status">کپی شد</div>
 
@@ -385,7 +385,10 @@ const R={
  TE:"https://github.com/mmeameh/tech-explainer-shorts",
  VI:"https://github.com/OnlyG4BB0/video-3d-studio",
  VI2:"https://github.com/SallyRS/video-director",
- AN5:"https://github.com/deenukhan/animation-styles"
+ AN5:"https://github.com/deenukhan/animation-styles",
+ CL8:"https://github.com/josselinonduty/claude-drawing-skill",
+ CO:"https://github.com/XiaoyeCodes/code-animation-prompts",
+ DR:"https://github.com/illodev/drawn-by-code"
 };
 const CATS=[
  {id:"start",t:"نقطه‌ی شروع",s:"اسکیل اصلی که کل ساخت ویدیو رو هدایت می‌کنه",i:"🚀",c:"#22e4ff"},
@@ -588,7 +591,32 @@ const S=[
  ["video-qa","reel","چک کات قبل از تحویل با شیت فریم و اندازه‌گیری.","CL2"],
  ["whiteboard-animation","anim","انیمیشن وایت‌برد با دستی که نقاشی می‌کشه.","EX"],
  ["wrapped-video","data","ویدیوی سبک Spotify Wrapped و مرور سال.","EX"],
- ["animation-styles","anim","یک ایده‌ی ۵ ثانیه‌ای در ۳۹ سبک: وایت‌برد، آبرنگ، اوکیوئه، هولوگرام، پیکسل، خمیری…","AN5"]
+ ["animation-styles","anim","یک ایده‌ی ۵ ثانیه‌ای در ۳۹ سبک: وایت‌برد، آبرنگ، اوکیوئه، هولوگرام، پیکسل، خمیری…","AN5"],
+ ["claude-drawing","anim","تصویرسازی کدی در ۷۷ سبک (آبرنگ، اوکیوئه، پیکسل، بلوپرینت…) بدون مدل تصویر.","CL8"],
+ ["code-animation-prompts","anim","۳۴۱ سبک انیمیشن کدی با استیل مرجع؛ انتخاب سبک با شماره (توضیحش چینیه).","CO"],
+ ["dbc-animate","anim","کارگردان drawn-by-code: از بریف تا MP4 نهایی با سبک‌های کشیده‌شده با کد.","DR"],
+ ["dbc-engine","anim","مرجع فنی موتور drawn-by-code برای کد صحنه و رندر.","DR"],
+ ["dbc-hands","anim","قواعد کشیدن دست کاراکترها در drawn-by-code.","DR"],
+ ["dbc-new-style","anim","ساخت سبک انیمیشن جدید در drawn-by-code.","DR"],
+ ["dbc-replicate","plan","بازسازی ۱:۱ یه ویدیوی رفرنس با اندازه‌گیری دقیق، عنصر به عنصر.","DR"],
+ ["dbc-review","anim","چک فریم‌ها بعد از هر رندر و اصلاح خودکار صحنه.","DR"],
+ ["dbc-sound","sound","موزیک، افکت و میکس برای ویدیوهای drawn-by-code.","DR"],
+ ["dbc-style-70s-poster","anim","سبک پوستر سایکدلیک دهه‌ی ۷۰.","DR"],
+ ["dbc-style-cereal-ad","anim","سبک تبلیغ تلویزیونی دهه‌ی ۹۰ روی نوار VHS.","DR"],
+ ["dbc-style-clay","anim","سبک خمیری استاپ‌موشن با اثر انگشت.","DR"],
+ ["dbc-style-clay3d","anim","عروسک‌های خمیری سه‌بعدی واقعی با نور استودیو.","DR"],
+ ["dbc-style-comic","anim","سبک کمیک‌بوک با هاف‌تون، بالن و افکت صوتی نوشتاری.","DR"],
+ ["dbc-style-engraving","anim","سبک حکاکی قدیمی برای معماری، ماشین و نمای انفجاری.","DR"],
+ ["dbc-style-felt3d","anim","عروسک‌های نمدی سه‌بعدی با پس‌زمینه‌ی شفاف.","DR"],
+ ["dbc-style-kaleidoscope","anim","سبک کالیدوسکوپ با تقارن و چرخش رنگ.","DR"],
+ ["dbc-style-line","anim","خط سیاه دست‌کش لرزون روی کاغذ سفید.","DR"],
+ ["dbc-style-liquid-light","anim","نورهای مایع و روغنی کنسرت‌های دهه‌ی ۶۰.","DR"],
+ ["dbc-style-paper-cutout","anim","سبک کاغذ بریده با لبه‌ی پاره و دست‌خط.","DR"],
+ ["dbc-style-pixel-art","anim","پیکسل آرت ۸ و ۱۶ بیتی با اسپرایت.","DR"],
+ ["dbc-style-risograph","anim","سبک چاپ ریسوگراف با چهار رنگ فلورسنت.","DR"],
+ ["dbc-style-sumi-e","anim","نقاشی جوهری ژاپنی (سومی‌ئه) روی کاغذ واشی.","DR"],
+ ["dbc-style-tabletop3d","anim","اشیای واقعی میز کار که جون می‌گیرن؛ سبک مینیاتوری.","DR"],
+ ["dbc-transitions","motion","ترنزیشن بین نماها و سبک‌ها: ورود از چشم، عنبیه، گرداب.","DR"]
 ];
 const TPL=[
  {t:"ریل اینفوگرافی و PNG",i:"📊",c:"#ffd23f",d:"مثل ریل نفت، تک هفتگی و مک‌بوک.",p:`/motion-graphics
